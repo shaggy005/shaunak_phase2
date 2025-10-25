@@ -99,3 +99,31 @@ picoCTF{0000005a}
 
 - none
 
+# 2. Vault Door 3
+
+> This vault uses for-loops and byte arrays. The source code for this vault is here: VaultDoor3.java
+
+## Solution:
+
+- 
+
+```
+
+```
+
+## Flag:
+
+```
+picoCTF{}
+```
+
+## Concepts learnt:
+
+- 
+
+## Notes:
+- 
+
+## Resources:
+
+- none
