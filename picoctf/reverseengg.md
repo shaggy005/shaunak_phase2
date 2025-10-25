@@ -44,26 +44,58 @@ picoCTF{549698}
 
 ## Solution:
 
-- 
+- the .s extension means that the file is an assembly file
+- i uploaded it to an online assembly to c converter and got the following code
 
 ```
+#include <stdio.h>
+#include <stdlib.h>
+
+int func(int input) {
+    int a = input;
+    int b = 68;
+    int c = 2;
+    int d = 3;
+
+    int temp = b << c;
+    temp = temp / d;
+    temp = temp - a;
+
+    return temp;
+}
+
+int main(int argc, char *argv[]) {
+    int val = atoi(argv[1]);
+    int result = func(val);
+
+    if (result == 0) {
+        puts("You win!");
+    } else {
+        puts("You Lose :(");
+    }
+
+    return 0;
+}
 
 ```
+this means that temp = 68 * 2 * 2 = 272, then we divide temp by 3, temp becomes 90, then temp becomes temp-input.
+so if we take input 90, the fuction returns 0. and in the main function we can see that it prints win when the fuction returns 0. hence 90 is the argument we need and 90 is 0x5a in hex and according to instructions, by padding it in 32 bits, our flag is picoCTF{0000005a}
 
 ## Flag:
 
 ```
-picoCTF{}
+picoCTF{0000005a}
 ```
 
 ## Concepts learnt:
 
-- 
+- decompilation and following logic
 
 ## Notes:
-- none
+- tried messing around with ghidra, couldnt get it to work, hence had to use an online tool https://www.codeconvert.ai/assembly-to-c-converter
+- need to learn ghidra properly
 
 ## Resources:
 
-- 
+- none
 
