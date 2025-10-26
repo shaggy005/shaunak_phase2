@@ -68,3 +68,104 @@ picoCTF{h1dd3n_1n_pLa1n_51GHT_18375919}
 
 
 ***
+# 1. tunn3l v1s10n
+
+> We found this file. Recover the flag.
+
+## Solution:
+
+- first i checked the type using file
+
+```
+┌──(shaunakkli㉿shaunakkali)-[~/Downloads]
+└─$ file tunn3l_v1s10n
+tunn3l_v1s10n: data
+
+```
+- i saw that the file type was just data, so it must be a corrupted file. i tried opening it as well but it didnt open
+```
+┌──(shaunakkli㉿shaunakkali)-[~/Downloads]
+└─$ exiftool tunn3l_v1s10n 
+ExifTool Version Number         : 13.25
+File Name                       : tunn3l_v1s10n
+Directory                       : .
+File Size                       : 2.9 MB
+File Modification Date/Time     : 2025:10:26 15:42:41+05:30
+File Access Date/Time           : 2025:10:26 15:42:44+05:30
+File Inode Change Date/Time     : 2025:10:26 15:42:44+05:30
+File Permissions                : -rw-rw-r--
+File Type                       : BMP
+File Type Extension             : bmp
+MIME Type                       : image/bmp
+BMP Version                     : Unknown (53434)
+Image Width                     : 1134
+Image Height                    : 306
+Planes                          : 1
+Bit Depth                       : 24
+Compression                     : None
+Image Length                    : 2893400
+Pixels Per Meter X              : 5669
+Pixels Per Meter Y              : 5669
+Num Colors                      : Use BitDepth
+Num Important Colors            : All
+Red Mask                        : 0x27171a23
+Green Mask                      : 0x20291b1e
+Blue Mask                       : 0x1e212a1d
+Alpha Mask                      : 0x311a1d26
+Color Space                     : Unknown (,5%()
+Rendering Intent                : Unknown (826103054)
+Image Size                      : 1134x306
+Megapixels                      : 0.347
+
+```
+- then i decided to check the header for this file
+```
+┌──(shaunakkli㉿shaunakkali)-[~/Downloads]
+└─$ head tunn3l_v1s10n 
+BM�&,����n2X&,%%#␦'␦1(%5,)3*'8/,/&#3*&-$ ;2.2)%0'#3*&8,(6+'9-+/&##)U=1�vf�fR�mV�pX�oT�oT�~c��m��iȗq��q��t��s��r��o��n��k��j��d�tU�wZ�oVvR:qR=lO@mRDnSIw^TS93pXRvaYs_T~k^�tc~jYvbPv^LzbP�m]�iY�sc�4$M6'J3$F, H."F."D."<& 02#␦6'<+">+$B,&^D>fLF63␦?0-K5*?)B.#K7,E1&?+ C/$C/$@*H2'K2(G.$@'E,"L4(L4(K3'J2&L2$N4&P5'R7)S6(U8*K0"]B4cI9I/D+
+( "␦ 
+```
+- then i decided to open the file in a hex editor https://hexed.it/
+- according to the bmp file format the header format is like this
+  ![68747470733a2f2f7777772e64796e616d736f66742e636f6d2f636f6465706f6f6c2f696d672f323031362f31322f424d502d66696c652d7374727563747572652e504e47](https://github.com/user-attachments/assets/56116c8d-6a5f-4e4f-960d-6babbce7991b)
+
+- the size is 2893454 bytes so the hex should be 8E 26 2C 00 (0X2C268E)
+- now we have the magic bytes 42 4d then the size 0x2c268e and then the offset 0xd0ba
+- then theres the dib header, it indicates a size of 53434 (0xd0ba) instead of 40 bytes
+- so we replace ba d0 by 28 00 (0x0028)
+- also the image dimensions are wrong so we fix it by changing the height
+- the height should be (0x2c268e-54(for the header))/(3*1134(1134 pixels width and 3 bytes per pixel))=850
+- 850 is 0x352 that shoukd be 52 03 in the header
+- in the end the header hex should look like this
+  <img width="1830" height="550" alt="image" src="https://github.com/user-attachments/assets/2500c482-b8e4-4e8f-a375-afa087854aaa" />
+- opening the image we get the flag
+  [tunn3l_v1s10n (4).bmp](https://github.com/user-attachments/files/23150589/tunn3l_v1s10n.4.bmp)
+
+## Flag:
+
+```
+picoCTF{qu1t3_a_v13w_2020}
+```
+
+## Concepts learnt:
+
+- learnt a shitload about how to hex edit and what that header represents
+- learnt some unnessasary amount of info about the bmp format 
+- also messed around with file sizes and stuff
+
+## Notes:
+
+- oh dont get me started on this, i tried everything from stegano to strings to hexdump and i actually tried to manually read that hex dump
+- spent unholy amount of time just figuring out the header
+
+## Resources:
+
+- http://www.fastgraph.com/help/bmp_header_format.html
+- https://en.wikipedia.org/wiki/BMP_file_format
+- http://www.ece.ualberta.ca/~elliott/ee552/studentAppNotes/2003_w/misc/bmp_file_format/bmp_file_format.htm
+- https://www.youtube.com/watch?v=kpHFFFu9qeU
+- http://www.ue.eti.pg.gda.pl/fpgalab/zadania.spartan3/zad_vga_struktura_pliku_bmp_en.html
+- https://examplefiles.org/example-image-files/sample-bmp-files
+
+
+***
