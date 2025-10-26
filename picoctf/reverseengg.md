@@ -105,24 +105,57 @@ picoCTF{0000005a}
 
 ## Solution:
 
-- 
+- here we have a java file VaultDoor3.java with this logic
 
 ```
+public boolean checkPassword(String password) {
+    if (password.length() != 32) {
+        return false;
+    }
+    char[] buffer = new char[32];
+    int i;
+    for (i=0; i<8; i++) {
+        buffer[i] = password.charAt(i);
+    }
+    for (; i<16; i++) {
+        buffer[i] = password.charAt(23-i);
+    }
+    for (; i<32; i+=2) {
+        buffer[i] = password.charAt(46-i);
+    }
+    for (i=31; i>=17; i-=2) {
+        buffer[i] = password.charAt(i);
+    }
+    String s = new String(buffer);
+    return s.equals("jU5t_a_sna_3lpm18g947_u_4_m9r54f");
+}
 
+```
+- this means it will check the final string against 
+```
+jU5t_a_sna_3lpm18g947_u_4_m9r54f
+```
+- so all i had to do now is trace back the string operations and i would have the input string that matches up with "jU5t_a_sna_3lpm18g947_u_4_m9r54f"
+- the first for loop just copies the first 8 characters
+- the second loop reverses the next 8 characters
+- the third and fourth loop interleave the next 16 characters
+- tracing back the operations on "jU5t_a_sna_3lpm18g947_u_4_m9r54f" i got the input string required
+```
+jU5t_a_s1mpl3_an4gr4m_4_u_79958f
 ```
 
 ## Flag:
 
 ```
-picoCTF{}
+picoCTF{jU5t_a_s1mpl3_an4gr4m_4_u_79958f}
 ```
 
 ## Concepts learnt:
 
-- 
+- reading java code i guess, it wasnt too hard tbh, just a whole lotta syntax
 
 ## Notes:
-- 
+- none
 
 ## Resources:
 
