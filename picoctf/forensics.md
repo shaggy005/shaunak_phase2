@@ -175,8 +175,8 @@ picoCTF{qu1t3_a_v13w_2020}
 
 ## Solution:
 
-- my first thought whenever i see an image is to just put it on ableton and see the spectogram, but that wast useful at all
-- then i thought of applying some filters removing the noise, spent a whole lotta time doing that
+- my first thought whenever i see an audio file is to just put it on ableton and see the spectogram, but that wasnt useful at all
+- then i thought of applying some filters removing the noise, spent a whole lotta time doing that. that didnt work as well
 - then i opened it in a hex editor and saw that it had JFIF in the strings
 - now i figured that there might be an image hidden in the audio
 - so i used a stegano decoder but alas that didnt work as well
