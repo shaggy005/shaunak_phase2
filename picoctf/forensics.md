@@ -68,7 +68,7 @@ picoCTF{h1dd3n_1n_pLa1n_51GHT_18375919}
 
 
 ***
-# 1. tunn3l v1s10n
+# 2. tunn3l v1s10n
 
 > We found this file. Recover the flag.
 
@@ -168,4 +168,46 @@ picoCTF{qu1t3_a_v13w_2020}
 - https://examplefiles.org/example-image-files/sample-bmp-files
 
 
+***
+# 3. m00nwalk
+
+> Decode this message from the moon
+
+## Solution:
+
+- my first thought whenever i see an image is to just put it on ableton and see the spectogram, but that wast useful at all
+- then i thought of applying some filters removing the noise, spent a whole lotta time doing that
+- then i opened it in a hex editor and saw that it had JFIF in the strings
+- now i figured that there might be an image hidden in the audio
+- so i used a stegano decoder but alas that didnt work as well
+- then i fell asleep
+- next morning i gave in and decided to see the clue
+- it said something about how images from moon were transmitted
+- got to know about sstv
+- got to know about qsstv and how to decode stuff, and spent a lot of time learning how it worked
+- wasted a bunch of time trying to make qsstv work on my linux vm
+- found an onine sstv decoder https://sstv-decoder.mathieurenaud.fr/ and just dragged and droppped the audio
+- boom there was the picture
+   <img width="320" height="256" alt="download (4)" src="https://github.com/user-attachments/assets/08ec1541-6643-4c16-8844-8d4d6deed292" />
+
+## Flag:
+
+```
+picoCTF{beep_boop_im_in_space}
+```
+
+## Concepts learnt:
+
+- SSTV and how to decode that shi
+  
+## Notes:
+
+- life is much easier just using online tools, i spent wayyy too much time trying to get qsstv to work
+
+## Resources:
+- https://en.wikipedia.org/wiki/Apollo_11_missing_tapes
+- https://github.com/ON4QZ/QSSTV
+- https://github.com/MarioKlebsch/QSSTV-macos
+- https://sstv-decoder.mathieurenaud.fr/
+- 
 ***
