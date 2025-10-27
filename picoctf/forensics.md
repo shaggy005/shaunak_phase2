@@ -188,7 +188,8 @@ picoCTF{qu1t3_a_v13w_2020}
 - wasted a bunch of time trying to make qsstv work on my linux vm
 - found an onine sstv decoder https://sstv-decoder.mathieurenaud.fr/ and just dragged and droppped the audio
 - boom there was the picture
-   <img width="320" height="256" alt="download (4)" src="https://github.com/user-attachments/assets/08ec1541-6643-4c16-8844-8d4d6deed292" />
+<img width="320" height="256" alt="download (4)" src="https://github.com/user-attachments/assets/2abe3f8b-7d7a-438b-89c7-32a441e53a71" />
+
 
 ## Flag:
 
