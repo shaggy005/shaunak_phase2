@@ -1,5 +1,44 @@
 oracle rsa
 
+
+
+from subprocess import run, PIPE
+
+# read password
+f = open("password.enc","r")
+c = int(f.read())
+f.close()
+print(c)
+
+m1 = "a"
+print("using m1 =", m1)
+m1_bytes = m1.encode("utf-8")
+m1_int = int.from_bytes(m1_bytes,"big")
+
+print("oracle encrypt")
+c1 = int(input("c1:"))
+
+# combine
+c2 = c*c1
+print(c2)
+
+# decrypt
+m2 = int(input("m2(hex):"),16)
+
+# recover password
+m_int = m2//m1_int
+m_bytes = m_int.to_bytes((m_int.bit_length()+7)//8,"big")
+m = m_bytes.decode("utf-8",errors="ignore")
+print(m)
+
+# decrypt secret
+r = run(["openssl","enc","-aes-256-cbc","-d","-in","secret.enc","-pass","pass:"+m],stdout=PIPE,stderr=PIPE,text=True)
+print(r.stdout)
+
+
+
+
+
 ┌──(shaunakkli㉿shaunakkali)-[~]
 └─$ python3 recover_flag.py
 
