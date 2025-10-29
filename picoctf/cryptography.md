@@ -142,70 +142,123 @@ picoCTF{su((3ss_(r@ck1ng_r3@_3319c817}
 
 ***
 
-# 2. 
-> Put in the challenge's description here
+# 2. Custom Encryption
+> Can you get sense of this code file and write the function that will decode the given encrypted file content.
+Find the encrypted file here flag_info and code file might be good to analyze and get the flag.
 
 ## Solution:
 
-- Include as many steps as you can with your thought process
-- You **must** include images such as screenshots wherever relevant.
+- The python script works as follows:
+  - first it reverses the plain text
+  - then it xors each char with text key = trudeau
+  - then it multiplies it by a key*311
+- So the reverse this, i just had to write a script to reverse this flow of operations
 
 ```
-put codes & terminal outputs here using triple backticks
+cipher=[237915,1850450,1850450,158610,2458455,2273410,1744710,1744710,1797580,1110270,0,2194105,555135,132175,1797580,0,581570,2273410,26435,1638970,634440,713745,158610,158610,449395,158610,687310,1348185,845920,1295315,687310,185045,317220,449395]
+key=pow(pow(31,21,97),95,97)
+text_key="trudeau"
+key_factor=key*311
+semi=[]
+for num in cipher:
+    if num==0:
+        semi.append(' ')
+    else:
+        semi.append(chr(int(num/key_factor+0.5)))
+semi_text="".join(semi)
+plain=""
+klen=len(text_key)
+for i in range(len(semi_text)):
+    ch=semi_text[i]
+    key_ch=text_key[i%klen]
+    plain+=chr(ord(ch)^ord(key_ch))
+plain=plain[::-1]
+print(plain)
 
-you may also use ```python for python codes for example
+```
+- running the script we get the flag
+```
+(myenv) shaunak@Shaunaks-MacBook-Pro ~ % python3 customcipher.py
+
+picoCTF{custom_d2cR0pt6D_66778b34}
+(myenv) shaunak@Shaunaks-MacBook-Pro ~ % 
 ```
 
 ## Flag:
 
 ```
-picoCTF{}
+picoCTF{custom_d2cR0pt6D_66778b34}
 ```
 
 ## Concepts learnt:
-
-
+- scripting i guess
 
 ## Notes:
-
+-none
 
 
 ## Resources:
-
+-none
 
 
 ***
 
-# 3. 
-> Put in the challenge's description here
+# 3. Mini RSA
+> What happens if you have a small exponent? There is a twist though, we padded the plaintext so that (M ** e) is just barely larger than N.
+
+Let's decrypt this:
 
 ## Solution:
 
-- Include as many steps as you can with your thought process
-- You **must** include images such as screenshots wherever relevant.
+- In RSA, we know that M^3 mod n = c. I can also rewrite this as M^3 = t * n + c for some integer t. That means M = iroot(t * n + c, 3). So, all I need to do is find the right t. Since M^3 is only slightly larger than n, it shouldn’t take me long to find it.
 
 ```
-put codes & terminal outputs here using triple backticks
+import gmpy2
 
-you may also use ```python for python codes for example
+n = 29331922499794985782735976045591164936683059380558950386560160105740343201513369939006307531165922708949619162698623675349030430859547825708994708321803705309459438099340427770580064400911431856656901982789948285309956111848686906152664473350940486507451771223435835260168971210087470894448460745593956840586530527915802541450092946574694809584880896601317519794442862977471129319781313161842056501715040555964011899589002863730868679527184420789010551475067862907739054966183120621407246398518098981106431219207697870293412176440482900183550467375190239898455201170831410460483829448603477361305838743852756938687673
+e = 3
+c = 2205316413931134031074603746928247799030155221252519872650080519263755075355825243327515211479747536697517688468095325517209911688684309894900992899707504087647575997847717180766377832435022794675332132906451858990782325436498952049751141
+
+for i in range(10000):
+    m, is_true_root = gmpy2.iroot(c + i*n, e)
+    if is_true_root:
+        print(f"Found i = {i}")
+        hex_m = format(m, 'x')
+        # Pad to even length
+        if len(hex_m) % 2 != 0:
+            hex_m = '0' + hex_m
+        try:
+            plaintext = bytearray.fromhex(hex_m).decode()
+        except UnicodeDecodeError:
+            plaintext = bytearray.fromhex(hex_m)
+        print("Message:", plaintext)
+        break
+
+
+```
+```
+┌──(shaunakkli㉿shaunakkali)-[~]
+└─$ python3 minirsasol.py
+Found i = 3533
+Message: picoCTF{n33d_a_lArg3r_e_d0cd6eae}
 ```
 
 ## Flag:
 
 ```
-picoCTF{}
+picoCTF{n33d_a_lArg3r_e_d0cd6eae}
 ```
 
 ## Concepts learnt:
 
-
+-scripting i guess 
 
 ## Notes:
-
+- none
 
 
 ## Resources:
-
+-same for all
 
 
 ***
