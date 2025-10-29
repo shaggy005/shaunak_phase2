@@ -91,8 +91,11 @@ picoCTF{y0u_m4d3_1t_79a0ddc6}
 
 ***
 
-# 2. 
-> Put in the challenge's description here
+# 2. SSTI1
+> I made a cool website where you can announce whatever you want! Try it out!
+Additional details will be available after launching your challenge instance.
+
+
 
 ## Solution:
 - 
