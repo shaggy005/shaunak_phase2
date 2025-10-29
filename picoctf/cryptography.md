@@ -237,9 +237,9 @@ for i in range(10000):
 
 ```
 ```
-┌──(shaunakkli㉿shaunakkali)-[~]
-└─$ python3 minirsasol.py
-Found i = 3533
+┌──(venv)─(shaunakkli㉿shaunakkali)-[~]
+└─$ python minirsa.py 
+Found i = 0
 Message: picoCTF{n33d_a_lArg3r_e_d0cd6eae}
 ```
 
