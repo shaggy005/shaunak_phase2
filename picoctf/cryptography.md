@@ -176,5 +176,39 @@ picoCTF{}
 
 ***
 
+# 3. 
+> Put in the challenge's description here
+
+## Solution:
+
+- Include as many steps as you can with your thought process
+- You **must** include images such as screenshots wherever relevant.
+
+```
+put codes & terminal outputs here using triple backticks
+
+you may also use ```python for python codes for example
+```
+
+## Flag:
+
+```
+picoCTF{}
+```
+
+## Concepts learnt:
+
+
+
+## Notes:
+
+
+
+## Resources:
+
+
+
+***
+
 
 
