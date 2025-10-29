@@ -1,7 +1,7 @@
 oracle rsa
 
 
-
+```
 from subprocess import run, PIPE
 
 # read password
@@ -34,11 +34,11 @@ print(m)
 # decrypt secret
 r = run(["openssl","enc","-aes-256-cbc","-d","-in","secret.enc","-pass","pass:"+m],stdout=PIPE,stderr=PIPE,text=True)
 print(r.stdout)
+```
 
 
 
-
-
+```
 ┌──(shaunakkli㉿shaunakkali)-[~]
 └─$ python3 recover_flag.py
 
@@ -50,9 +50,9 @@ c1:18947923769352420284655563666180110195485115758819454136683513054417168295477
 m2(hex):136665a6be83
 3319c
 picoCTF{su((3ss_(r@ck1ng_r3@_3319c817}
+```
 
-
-
+```
 ┌──(shaunakkli㉿shaunakkali)-[~]
 └─$ nc titan.picoctf.net 55883
 *****************************************
@@ -77,3 +77,4 @@ decrypted ciphertext: fe¦¾
 
 what should we do for you? 
 E --> encrypt D --> decrypt. 
+```
