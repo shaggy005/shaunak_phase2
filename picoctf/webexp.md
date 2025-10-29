@@ -3,11 +3,11 @@
 >http://shape-facility.picoctf.net:64326/
 >http://shape-facility.picoctf.net:64326/filter.php
 >Hints:
-  - You are not allowed to login with valid credentials.
-  - Write down the injections you use in case you lose your progress.
-  - For some filters it may be hard to see the characters, always (always) look at the raw hex in the response.
-  - sqlite
-  - If your cookie keeps getting reset, try using a private browser window
+>  - You are not allowed to login with valid credentials.
+>  - Write down the injections you use in case you lose your progress.
+>  - For some filters it may be hard to see the characters, always (always) look at the raw hex in the response.
+>  - sqlite
+>  - If your cookie keeps getting reset, try using a private browser window
 
 ## Solution:
 - i just use some of the popular sql injections
