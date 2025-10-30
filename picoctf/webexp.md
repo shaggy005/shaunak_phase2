@@ -134,29 +134,34 @@ picoCTF{s4rv3r_s1d3_t3mp14t3_1nj3ct10n5_4r3_c001_f5438664}
 
 ***
 
-# 3. 
-> 
+# 3. Cookies
+> Who doesn't love cookies? Try to figure out the best one. http://mercury.picoctf.net:21485/
 
 ## Solution:
-- 
+- Here i open the website, and since its about inspecting the cookies, i open the developer tools
+- i type in "snickerdoodle" and i see a cookie with value 0
+- then i type in 1, it shows oatmeal raisin but that isnt the correct cookie
+- then i type 50, i shows invalid
+- then i type 30 it shows invalid
+- then i type 20 and i see a cookie, that means the correct cookie must be less than 30, so its realistic to just manually tyoe in and check all the cookies
+- so i keep on incrementing, it was a boring but nessasary
+- at cookie#18 i find the flag
+  <img width="1466" height="749" alt="image" src="https://github.com/user-attachments/assets/4d0f1e5b-300d-4d71-9bb7-b4be5e4af70a" />
 
-```
-
-```
 
 ## Flag:
 
 ```
-picoCTF{}
+picoCTF{3v3ry1_l0v3s_c00k135_94190c8a}
 ```
 
 ## Concepts learnt:
--
+- how to scan cookies
 
 ## Notes:
--
+- none
 
 ## Resources:
--
+- none
 
 ***
