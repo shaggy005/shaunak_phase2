@@ -221,7 +221,15 @@ firmware.elf: ELF 32-bit LSB executable, Atmel AVR 8-bit, version 1 (SYSV), stat
 shaunak@Shaunaks-MacBook-Pro bare-metal-alchemist % 
 
 ```
-- 
+- then i tried strings, hexdump, xxd but that didnt work
+- then i realised that the flag might be hidden by XORing it with a single byte key
+- If the whole file or a large section is XORed with the same byte, brute-forcing 0..255 keys and looking for an ASCII-looking pattern should work
+- So I tried brute-forcing every 1-byte XOR key and scanning the decoded bytes for a flag-shaped string
+- Flags typically look like NAME{...}. The regex I used was fairly permissive but safely anchored to common characters
+```
+rb"[A-Za-z0-9_]{1,20}\{[A-Za-z0-9_\-+=\/\\\.\s]{8,220}\}"
+
+```
 ```
 shaunak@Shaunaks-MacBook-Pro bare-metal-alchemist % python3 bma.py 
 k= 9 flag= f{zVlgm	VVz}
@@ -239,16 +247,21 @@ k= 107 flag= mzjyjhcpcNcxnkkkjzk{mzjyjhcpcNcxnkkk}
 k= 165 flag= TFCCTF{Th1s_1s_som3_s1mpl3_4rdu1no_f1rmw4re}
 shaunak@Shaunaks-MacBook-Pro bare-metal-alchemist % 
 ```
-
+- range(256) tries keys 0..255 (including 0 in case file isn't XORed)
+- finditer prints all candidate matches rather than stopping at first. Useful if there are multiple garbage-looking matches and you want to inspect them all
+- .decode("utf-8", "replace") avoids crashes on invalid UTF-8 and still prints printable characters; you can use "latin-1" instead to preserve raw byte values.
 
 ## Flag:
 
 ```
-picoCTF{}
+TFCCTF{Th1s_1s_som3_s1mpl3_4rdu1no_f1rmw4re}
 ```
 
 ## Concepts learnt:
--
+- elf file formats and what they do
+- how to search for flags in binaries using python
+- regex in python
+- damnn did i have to learn a whole lotta python
 
 ## Notes:
 -
