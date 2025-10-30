@@ -10,6 +10,7 @@ As an example, entering x = 34359738368 gives (y0, ..., y11), so the flag would 
 - HOOLY FIN SHIIIIIT did this one take my time
 - i just converted the input in binary and used it as the input for the schematic
 - input : 011100011000101001000100101010101110
+- opened up the notes app and started with 3 input at a time and finished the entire thing aaaaaah
 - took me 4 hrs but here you go
   
 ![PHOTO-2025-10-30-21-01-09](https://github.com/user-attachments/assets/f3385020-f6f6-459e-a33f-9aabf398c724)
