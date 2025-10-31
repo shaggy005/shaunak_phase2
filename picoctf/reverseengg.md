@@ -289,7 +289,7 @@ picoCTF{jU5t_a_s1mpl3_an4gr4m_4_u_79958f}
 
 - none
 ***
-# ARMssembly 0
+# 4. ARMssembly 0
 > What integer does this program print with arguments `3854998744` and `915131509`? File: chall.S Flag format: picoCTF{XXXXXXXX} -> (hex, lowercase, no 0x, and 32 bits. ex. 5614267 would be picoCTF{0055aabb})
 ## Solution
 - Ill explain whats happening line by line in the assembly
