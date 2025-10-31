@@ -1,7 +1,7 @@
 # 1. Buffer overflow 0
 >Let's start off simple, can you overflow the correct buffer? The program is available here. You can view source here.
 Connect using:
-`nc saturn.picoctf.net 52136`
+nc saturn.picoctf.net 49832
 
 ## Solution:
 - I open the c code and read it thorougly
@@ -15,10 +15,11 @@ Connect using:
 - That gives away the flag
 
 ```
-shaunak@Shaunaks-MacBook-Pro bare-metal-alchemist % nc saturn.picoctf.net 52136
-Input: sdgfjhdajhvvhdkhdsvjdkghdjfkhdgjdkhgjdhjdsjgkdjghkdhgjdjkfdsjgsbhckh
+shaunak@Shaunaks-MacBook-Pro ~ % nc saturn.picoctf.net 49832
+
+Input: vcbnmvcxzcvbcxsertefghcbvxzsrtyjuhgfdsgdhfjhkjhgfdshjkl
 picoCTF{ov3rfl0ws_ar3nt_that_bad_9f2364bc}
-shaunak@Shaunaks-MacBook-Pro bare-metal-alchemist %
+shaunak@Shaunaks-MacBook-Pro ~ % 
 ```
 
 ## Flag:
@@ -40,30 +41,43 @@ picoCTF{ov3rfl0ws_ar3nt_that_bad_9f2364bc}
 
 ***
 
-# 2. 
-> Put in the challenge's description here
+# 2. format string 0
+> Can you use your knowledge of format strings to make the customers happy?
+Download the binary here.
+Download the source here.
+Connect with the challenge instance here:
+nc mimas.picoctf.net 58666
 
 ## Solution:
-- 
+- LMAO this is the same as the last one, this one also uses a sigsev function
+- so my first thought as soon as i opened the netcat was to just put a very looooong input and boom there was the flag lol
 
 ```
+shaunak@Shaunaks-MacBook-Pro ~ % nc mimas.picoctf.net 58666
+Welcome to our newly-opened burger place Pico 'n Patty! Can you help the picky customers find their favorite burger?
+Here comes the first customer Patrick who wants a giant bite.
+Please choose from the following burgers: Breakf@st_Burger, Gr%114d_Cheese, Bac0n_D3luxe
+Enter your recommendation: gfsdhghjkgfdgsfhgjklhgkfjhdsghfjkl;hgkfhdsgfgdfjgkhljhgfzx
+There is no such burger yet!
 
+picoCTF{7h3_cu570m3r_15_n3v3r_SEGFAULT_63191ce6}
+shaunak@Shaunaks-MacBook-Pro ~ % 
 ```
 
 ## Flag:
 
 ```
-picoCTF{}
+picoCTF{7h3_cu570m3r_15_n3v3r_SEGFAULT_63191ce6}
 ```
 
 ## Concepts learnt:
--
+- same as the last one, i didnt even read the code past the 1st function
 
 ## Notes:
--
+- this was my fastest solve yet, under a minute
 
 ## Resources:
--
+- same as last one
 
 ***
 
