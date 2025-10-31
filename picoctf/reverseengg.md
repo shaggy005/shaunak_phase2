@@ -288,3 +288,103 @@ picoCTF{jU5t_a_s1mpl3_an4gr4m_4_u_79958f}
 ## Resources:
 
 - none
+***
+# ARMssembly 0
+## Solution
+- Ill explain whats happening line by line in the assembly
+```
+	.arch armv8-a
+	.file	"chall.c"
+
+	.text
+	.align	2
+	.global	func1
+	.type	func1, %function
+
+func1:
+	sub	sp, sp, #16          // allocates 16 bytes on the stack
+	str	w0, [sp, 12]         // stores first argument (arg1) at sp+12
+	str	w1, [sp, 8]          // stores second argument (arg2) at sp+8
+	ldr	w1, [sp, 12]         // loads arg1 into w1
+	ldr	w0, [sp, 8]          // loads arg2 into w0
+	cmp	w1, w0               // compares arg1 and arg2
+	bls	.L2                  // if arg1 <= arg2, branches to .L2
+	ldr	w0, [sp, 12]         // else, w0 = arg1 (returns arg1)
+	b	.L3                   // jumps to .L3 to return
+.L2:
+	ldr	w0, [sp, 8]          // w0 = arg2 (returns arg2 if arg1 <= arg2)
+.L3:
+	add	sp, sp, 16          
+	ret                     
+	.size	func1, .-func1  
+
+//----------------------------------------------------
+
+	.section	.rodata
+	.align	3
+.LC0:
+	.string	"Result: %ld\n"      // printf format string
+
+//----------------------------------------------------
+
+	.text
+	.align	2
+	.global	main
+	.type	main, %function
+
+main:
+	stp	x29, x30, [sp, -48]!  
+	add	x29, sp, 0            
+	str	x19, [sp, 16]        
+	str	w0, [x29, 44]         // stores argc
+	str	x1, [x29, 32]         // stores argv
+
+	// ----- get argv[1] -----
+	ldr	x0, [x29, 32]         // loads argv (char **)
+	add	x0, x0, 8             // points to argv[1]
+	ldr	x0, [x0]              // loads argv[1] (string)
+	bl	atoi                  // converts to integer
+	mov	w19, w0               // stores as first integer argument in w19
+
+	// ----- get argv[2] -----
+	ldr	x0, [x29, 32]         // loads argv again
+	add	x0, x0, 16            // points to argv[2]
+	ldr	x0, [x0]              // loads argv[2] (string)
+	bl	atoi                  // converts to integer
+	mov	w1, w0                // w1 = second integer argument
+	mov	w0, w19               // w0 = first integer argument
+
+	// ----- call func1(a,b) -----
+	bl	func1                 // returns max(a,b) (unsigned compare)
+
+	// ----- print result -----
+	mov	w1, w0                // moves return value into w1 (printf arg)
+	adrp	x0, .LC0              // load address of format string
+	add	x0, x0, :lo12:.LC0
+	bl	printf                // print "Result: <value>"
+
+	mov	w0, 0                
+	ldr	x19, [sp, 16]         
+	ldp	x29, x30, [sp], 48    
+	ret                       
+
+	.size	main, .-main
+	.ident	"GCC: (Ubuntu/Linaro 7.5.0-3ubuntu1~18.04) 7.5.0"
+	.section	.note.GNU-stack,"",@progbits
+
+```
+- So effectively:
+  ```
+  int a = atoi(argv[1]);
+  int b = atoi(argv[2]);
+  printf("Result: %ld\n", func1(a,b));
+  ```
+- a = 3854998744 b = 915131509
+- Unsigned compare → 3854998744 > 915131509
+- Return 3854998744 = e5c69cd8
+## FLag
+```
+picoCTF{e5c69cd8}
+```
+
+  
