@@ -5,8 +5,8 @@ nc saturn.picoctf.net 49832
 
 ## Solution:
 - I open the c code and read it thorougly
-- I see that the print function uses a `sigsedv_handler()` function
-- It meands that the flag is printed when a segmentation fault is triggered
+- I see that the print function uses a 'sigsedv' function
+- It means that the flag is printed when a segmentation fault is triggered
 - Segmentation fault happens when a program tries to access memory that is restricted or that doesnt exist at all.
 - Also we see that the input is taken using a `gets()` function.
 - `gets()` is known to be notorious with buffer overflows, that means it will write input to a stack without knowing its allocated length
