@@ -1,12 +1,12 @@
 # 1. GDB baby step 1
 
-> Can you figure out what is in the eax register at the end of the main function? Put your answer in the picoCTF flag format: picoCTF{n} where n is the contents of the eax register in the decimal number base. If the answer was 0x11 your flag would be picoCTF{17}.
+> Can you figure out what is in the `eax` register at the end of the main function? Put your answer in the picoCTF flag format: picoCTF{n} where n is the contents of the eax register in the decimal number base. If the answer was `0x11` your flag would be `picoCTF{17}`.
 Disassemble debugger0_a
 
 ## Solution:
 
-- downloaded the file debugger0_a
-- opened it in ghidra coderunner
+- downloaded the file `debugger0_a`
+- opened it in `ghidra` coderunner
 - searched for the main fuction
 
 ```
@@ -17,8 +17,8 @@ undefined8 main(void)
 }
 
 ```
-- converting 0x86342 to decimal we get 549698
-- hence the flag is picoCTF{549698}
+- converting `0x86342` to decimal we get `549698`
+- hence the flag is `picoCTF{549698}`
 
 ## Flag:
 
@@ -28,7 +28,7 @@ picoCTF{549698}
 
 ## Concepts learnt:
 
-- how to use ghidra decompiler
+- how to use `ghidra` decompiler
 - searching functions inside decompiled code
 
 ## Notes:
@@ -154,12 +154,12 @@ func:
     ret
 
 ```
-- so functionally result = ((a<<b)/c)-input
-- then it checks if function(input)==0
-- then it pronts you win
-- hence func(input) = 90 - input and that must be 0
-- so our input should be 90
-- 90 is 0x5a in hex, and padding that according to the instructions we get 0000005a
+- so functionally `result = ((a<<b)/c)-input`
+- then it checks if `function(input)==0`
+- then it prints `you win`
+- hence `func(input) = 90 - input` and that must be 0
+- so our input should be `90`
+- `90` is `0x5a` in hex, and padding that according to the instructions we get `0000005a`
 - and we have our flag
 ## Flag
 ```
@@ -290,6 +290,7 @@ picoCTF{jU5t_a_s1mpl3_an4gr4m_4_u_79958f}
 - none
 ***
 # ARMssembly 0
+> What integer does this program print with arguments `3854998744` and `915131509`? File: chall.S Flag format: picoCTF{XXXXXXXX} -> (hex, lowercase, no 0x, and 32 bits. ex. 5614267 would be picoCTF{0055aabb})
 ## Solution
 - Ill explain whats happening line by line in the assembly
 ```
@@ -379,9 +380,9 @@ main:
   int b = atoi(argv[2]);
   printf("Result: %ld\n", func1(a,b));
   ```
-- a = 3854998744 b = 915131509
+- a = `3854998744` b = `915131509`
 - Unsigned compare → 3854998744 > 915131509
-- Return 3854998744 = e5c69cd8
+- Return 3854998744 = `e5c69cd8`
 ## FLag
 ```
 picoCTF{e5c69cd8}
