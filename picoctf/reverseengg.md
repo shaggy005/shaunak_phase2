@@ -44,7 +44,57 @@ picoCTF{549698}
 
 > For what argument does this program print `win` with variables 68, 2 and 3? File: chall_1.S Flag format: picoCTF{XXXXXXXX} -> (hex, lowercase, no 0x, and 32 bits. ex. 5614267 would be picoCTF{0055aabb})
 
-## Solution:
+## Solution
+- We’re given a disassembled ARM64 source file chall_1.S
+- It defines two functions — func and main
+- this is the important part in the assembly (ive added comments to explain what they do)
+```
+.global func
+func:
+    sub sp, sp, #32
+    str w0, [sp, 12]      // store argument (input)
+    mov w0, 68
+    str w0, [sp, 16]
+    mov w0, 2
+    str w0, [sp, 20]
+    mov w0, 3
+    str w0, [sp, 24]
+
+    ldr w0, [sp, 20]      // w0 = 2
+    ldr w1, [sp, 16]      // w1 = 68
+    lsl w0, w1, w0        // w0 = 68 << 2 = 272
+    str w0, [sp, 28]
+
+    ldr w1, [sp, 28]      // w1 = 272
+    ldr w0, [sp, 24]      // w0 = 3
+    sdiv w0, w1, w0       // w0 = 272 / 3 = 90 (integer division)
+    str w0, [sp, 28]
+
+    ldr w1, [sp, 28]      // w1 = 90
+    ldr w0, [sp, 12]      // w0 = input
+    sub w0, w1, w0        // w0 = 90 - input
+    str w0, [sp, 28]
+
+    ldr w0, [sp, 28]
+    add sp, sp, 32
+    ret
+
+```
+- so functionally result = ((a<<b)/c)-input
+- then it checks if function(input)==0
+- then it pronts you win
+- hence func(input) = 90 - input and that must be 0
+- so our input should be 90
+- 90 is 0x5a in hex, and padding that according to the instructions we get 0000005a
+- and we have our flag
+## Flag
+```
+picoCTF{0000005a}
+
+```
+
+
+# Alternate Solution for ARMssembly 1:
 
 - the .s extension means that the file is an assembly file
 - i uploaded it to an online assembly to c converter and got the following code
