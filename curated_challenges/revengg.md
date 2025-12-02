@@ -171,4 +171,4 @@ So the final 10-letter string is:
 
 The program prints the flag:
 
-**KCTF{NjkSfTYaIi}***
+**KCTF{NjkSfTYaIi}**
