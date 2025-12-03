@@ -1,4 +1,4 @@
-# JoyDivision
+# 1. JoyDivision
 First i decompile it
 So the program gives us a weird looking flag.txt after it runs, but that file is not the real flag. It’s some transformed/encrypted version of the flag. I looked at the code and basically the program messes with the original flag in two ways:
 - It flips the bytes (like NOT and XOR)
@@ -94,7 +94,7 @@ for i in range(len(a)):
 
 print(o.decode("utf-8","ignore"))
 ```
-## The Output
+### The Output
 ```
 shaunak@Shaunaks-MacBook-Pro JoyDivision % base64 -i flag.txt -o flag.txt.b64
 
@@ -109,7 +109,7 @@ sunshine{C3A5ER_CR055ED_TH3_RUB1C0N}
 ```
 
 
-## Notes
+### Notes
 
 - I didn’t need to understand every tiny bit of the C code — just the order of operations.
 
@@ -122,7 +122,7 @@ sunshine{C3A5ER_CR055ED_TH3_RUB1C0N}
 - Base64 was important so the bytes don’t get corrupted.
 
 
-#  Worthy Knight
+# 2. Worthy Knight
 First I decompile it
 It asks for a 10 letter password.
 Then it checks each pair of 2 letters.
@@ -259,7 +259,7 @@ The program prints the flag:
 
 **KCTF{NjkSfTYaIi}**
 
-# time
+# 3. time
 I opened the binary in ida, and read the pseudocode.
 
 inside main(), i saw that the program is a number-guessing game that generates a random number using srand(time(0)) and then rand(), asks for a guess and then prints the secret number afterwards if the guess is wrong, else it prints the flag from flag.txt
