@@ -434,3 +434,140 @@ DawgCTF{FR33_C4R_W45H!}
 There was also some process ID check in the code, but it didn’t matter because we were extracting the bytes directly.
 
 ## dusty_intermediate
+
+The binary was a Rust program, so the decompiled code looked huge and confusing.
+I couldn’t understand the functions or the naming, so instead of trying to read everything, I focused only on the parts that looked important.
+
+### Finding the Important Part
+
+When I scrolled through the decompiler, I saw two things that stood out:
+Something inside the program was taking bytes of my input and changing them
+The program compared the result to exactly 21 bytes that were stored inside the binary
+So I realized:
+If I can find those 21 bytes and whatever table the program uses to change my input, I can reverse it and get the correct input then that should be the flag.
+
+### Finding the 21 Secret Bytes
+
+In the decompiled code, I found constants like:
+```
+0x7097E6D32231D9EA
+0x6876FC611BA8A216
+0x27B8AB7B
+0x96
+```
+These were grouped right before the comparison, so I assumed they were the 21 output bytes the program wanted.
+I used Python to unpack them into real bytes.
+This gave me:``ead93122d3e6977016a2a81b61fc76687babb82796``
+So that’s the 21 output bytes the program expects.
+
+### Finding the Table the Program Uses
+
+In the code I kept seeing a reference to:
+unk_61298
+Looked like some kind of array.
+I checked .rodata in the binary and found that starting at file offset 0x61298 there are 256 bytes, which looked like a full lookup table.
+So I dumped those 256 bytes using Python.
+
+### Realizing How the Program Transforms My Input
+
+Even though the code was confusing, I noticed the important lines:
+There is a variable v13 starting at 117
+Every time a byte of input is processed, the code does:
+```
+v13 = v13 + input_byte   (mod 256)
+output = table[v13]
+```
+So basically the program:
+Takes your input byte
+Adds it to a running value
+Uses the result as an index into the table
+That then becomes the output byte
+Since I know the output and I know the table, I can reverse the math.
+
+### Reversing It (Step by Step)
+
+For every expected output byte:
+Look inside the table for where that byte appears
+That table index is the state value
+Since state = (previous_state + input_byte) mod 256
+I can solve:
+```
+input_byte = (state - previous_state) mod 256
+```
+then do this 21 time over till i recover all the input bytes.
+
+### Writing a python script (wow how predictable)
+
+I put everything into a Python script that:
+- Opens the binary
+- Reads the 256-byte table
+- Builds the 21 expected bytes
+- Loops through each expected byte and reverses the math
+- Prints the flag
+```
+import sys, struct
+
+b = open(sys.argv[1], "rb")
+# grab sub table (0x61298)
+b.seek(0x61298)
+tbl = b.read(256)
+print("sub table (first 64 bytes):")
+print(tbl[:64].hex())
+print()
+# expected bytes (from decompiler)
+exp = b''
+exp += struct.pack("<Q", 0x7097E6D32231D9EA)
+exp += struct.pack("<Q", 0x6876FC611BA8A216)
+exp += struct.pack("<I", 0x27B8AB7B)
+exp += struct.pack("<B", 0x96)
+print("expected 21 bytes:")
+print(exp.hex())
+print()
+# invert transform
+rev = {}
+for i in range(256):
+    x = tbl[i]
+    if x not in rev:
+        rev[x] = []
+    rev[x].append(i)
+
+state = 117
+out = []
+
+for e in exp:
+
+    # find table index producing e
+
+    for s in rev[e]:
+        inp = (s - state) & 0xff
+        if ((state + inp) & 0xff) == s:
+            out.append(inp)
+            state = s
+            break
+
+print("recovered 21 bytes (hex):")
+print(bytes(out).hex())
+print()
+
+try:
+    print("FLAG:", bytes(out).decode())
+except:
+    print("flag bytes:", bytes(out))
+
+```
+```
+shaunak@Shaunaks-MacBook-Pro dusty % python3 intersolve.py dust_intermediate
+sub table (first 64 bytes):
+9fd2d6a89976b875e20e5067c93aa0b515ee59be7da3fb51df7cd90de72dad28eddc3d141379af27d1d5a1f937c0ef253877ff1b40608f456f086dd3353fb42f
+
+expected 21 bytes:
+ead93122d3e6977016a2a81b61fc76687babb82796
+
+recovered 21 bytes (hex):
+446177674354467b53303030305f434c34334e217d
+
+FLAG: DawgCTF{S0000_CL43N!}
+shaunak@Shaunaks-MacBook-Pro dusty % 
+```
+### Final Flag
+``DawgCTF{S0000_CL43N!}``
