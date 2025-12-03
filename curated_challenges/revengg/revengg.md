@@ -317,3 +317,118 @@ This confirms the patch worked because the win message appears every time.
 
 ### Notes
 also i had to deal with a lot of compatibilty bs because im on a mac and the binary wont run on my machine or on my kali vm either, had to make a docker x86 environment to run and test the binaries
+
+# 5. Dusty
+## dust_noob
+- opened this in ida 
+- never dissassembled a rust binary so never did i expect so many functions. finally after some yt tutorials realised that here the main function is supposed to be called shinyclean or something
+- opened that function and generated pseudocode for it in ida to understand it faster
+```
+__int64 shinyclean::main::h4b15dd54e331d693()
+{
+  __int64 v1; // [rsp+8h] [rbp-100h]
+  _BYTE s[23]; // [rsp+2Ah] [rbp-DEh] BYREF
+  _BYTE v3[22]; // [rsp+41h] [rbp-C7h] BYREF
+  _BYTE v4[9]; // [rsp+57h] [rbp-B1h] BYREF
+  _BYTE v5[48]; // [rsp+60h] [rbp-A8h] BYREF
+  _QWORD v6[4]; // [rsp+90h] [rbp-78h] BYREF
+  _BYTE v7[48]; // [rsp+B0h] [rbp-58h] BYREF
+  _BYTE *v8; // [rsp+E0h] [rbp-28h]
+  void *v9; // [rsp+E8h] [rbp-20h]
+  _BYTE *v10; // [rsp+F0h] [rbp-18h]
+  void *v11; // [rsp+F8h] [rbp-10h]
+  _BYTE *v12; // [rsp+100h] [rbp-8h]
+
+  memset(s, 0, sizeof(s));
+  qmemcpy(v3, "{^HX|kyDym", 10);
+  v3[10] = 12;
+  v3[11] = 12;
+  v3[12] = 96;
+  v3[13] = 124;
+  v3[14] = 11;
+  v3[15] = 109;
+  v3[16] = 96;
+  v3[17] = 104;
+  v3[18] = 11;
+  v3[19] = 10;
+  v3[20] = 119;
+  v3[21] = 30;
+  strcpy(v4, "B");
+  v4[2] = 0;
+  *(_WORD *)&v4[3] = 0;
+  *(_DWORD *)&v4[5] = 0;
+  do
+  {
+    if ( *(_QWORD *)&v4[1] >= 0x17u )
+      core::panicking::panic_bounds_check::h8307ccead484a122(*(_QWORD *)&v4[1], 23, &off_54578);
+    s[*(_QWORD *)&v4[1]] = v3[*(_QWORD *)&v4[1]] ^ 0x3F;
+    v1 = *(_QWORD *)&v4[1] + 1LL;
+    if ( *(_QWORD *)&v4[1] == -1 )
+      core::panicking::panic_const::panic_const_add_overflow::hf2f4fb688348b3b0(&off_545A8);
+    ++*(_QWORD *)&v4[1];
+  }
+  while ( v1 != 23 );
+  if ( (unsigned int)std::process::id::hcbcee05e6d949703() == 29485234 )
+  {
+    v10 = s;
+    v11 = &core::array::_$LT$impl$u20$core..fmt..Debug$u20$for$u20$$u5b$T$u3b$$u20$N$u5d$$GT$::fmt::hf6f6e41e4948d91c;
+    v12 = s;
+    v8 = s;
+    v9 = &core::array::_$LT$impl$u20$core..fmt..Debug$u20$for$u20$$u5b$T$u3b$$u20$N$u5d$$GT$::fmt::hf6f6e41e4948d91c;
+    v6[2] = s;
+    v6[3] = &core::array::_$LT$impl$u20$core..fmt..Debug$u20$for$u20$$u5b$T$u3b$$u20$N$u5d$$GT$::fmt::hf6f6e41e4948d91c;
+    v6[0] = s;
+    v6[1] = &core::array::_$LT$impl$u20$core..fmt..Debug$u20$for$u20$$u5b$T$u3b$$u20$N$u5d$$GT$::fmt::hf6f6e41e4948d91c;
+    core::fmt::Arguments::new_v1::hfac9ebf3d99d1264(v5, &unk_545C0, v6);
+    return std::io::stdio::_print::he7d505d4f02a1803(v5);
+  }
+  else
+  {
+    core::fmt::Arguments::new_const::hf72ed85907e377bb(v7, &off_545E0);
+    return std::io::stdio::_print::he7d505d4f02a1803(v7);
+  }
+}
+```
+Inside it, there were a bunch of byte arrays like s, v3, etc.
+
+noticed something interstiing
+```
+qmemcpy(v3, "{^HX|kyDym", 10);
+
+v3[10] = 12;
+v3[11] = 12;
+v3[12] = 96;
+v3[13] = 124;
+v3[14] = 11;
+v3[15] = 109;
+v3[16] = 96;
+v3[17] = 104;
+v3[18] = 11;
+v3[19] = 10;
+v3[20] = 119;
+v3[21] = 30;
+```
+
+- this was the first 22 bytes of some encoded data
+- then i saw the code accidentally reads one more byte: ``s[i] = v3[i] ^ 0x3F;``
+- but at index 22, v3[22] actually comes from v4[0], which was set to 'B'.
+- so the full array has 23 bytes total.
+- shen there was a loop: ``s[i] = v3[i] ^ 0x3F;``
+- this means the real flag characters are stored in v3, but XOR-encrypted with 0x3F.
+- so to decode the flag, I rebuilt v3 in Python and XORed each byte with 0x3F.
+
+Here is the Python script I wrote:
+```
+base = list(b"{^HX|kyDym")
+extras = [12,12,96,124,11,109,96,104,11,10,119,30]
+v3 = base + extras
+v3.append(ord('B'))
+
+flag = "".join(chr(b ^ 0x3F) for b in v3)
+print(flag)
+```
+When I ran it, I got:
+```
+DawgCTF{FR33_C4R_W45H!}
+```
+There was also some process ID check in the code, but it didn’t matter because we were extracting the bytes directly.
