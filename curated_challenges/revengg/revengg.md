@@ -245,7 +245,7 @@ So last pair is:
 
 **Ii**
 
-## Final Incantation
+### final Incantation
 
 Putting all pairs together:
 
@@ -315,5 +315,5 @@ root@c05751c9661d:/home#
 ```
 This confirms the patch worked because the win message appears every time.
 
-## Notes
+### Notes
 also i had to deal with a lot of compatibilty bs because im on a mac and the binary wont run on my machine or on my kali vm either, had to make a docker x86 environment to run and test the binaries
