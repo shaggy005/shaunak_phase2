@@ -1274,3 +1274,62 @@ So the final 10-letter string is:
 The program prints the flag:
 
 **KCTF{NjkSfTYaIi}**
+
+# time
+I opened the binary in ida, and read the pseudocode.
+
+inside main(), i saw that the program is a number-guessing game that generates a random number using srand(time(0)) and then rand(), asks for a guess and then prints the secret number afterwards if the guess is wrong, else it prints the flag from flag.txt
+
+the important part of the function looked like this:
+```
+if (v6 == v5)
+{
+    puts("You won. Guess was right! Here's your flag:");
+    giveFlag();
+}
+else
+{
+    puts("Sorry. Try again, wrong guess!");
+}
+```
+
+v6 is the random number generated using rand(), and v5 is the number the user enters.
+the flag printing happens inside giveFlag(), which simply opens: **/home/h3/flag.txt**
+and prints whatever is inside it.
+so the logic is:
+if I guess the random number, i get the flag
+if not, i don't get the flag (wow surprise)
+
+***but the number is based on the current time and changes every run, so brute-forcing it or predicting it manually is basically impossible***
+then I looked at the assembly for the if statement. The important part was:
+```
+cmp [rbp+var_C], eax
+jnz short loc_fail
+```
+since I wanted to always win, I decided to patch the binary by removing this conditional jump.
+in IDA, I replaced jnz with two nops.
+nop is basically a null instruction
+```
+cmp [rbp+var_C], eax
+nop
+nop
+```
+this means the program will always go to the “You won” branch and call giveFlag().
+After patching the bytes and exporting the binary, I ran it again.
+Now it instantly prints:
+```
+root@c05751c9661d:/home# ./time
+Welcome to the number guessing game!
+I'm thinking of a number. Can you guess it?
+Guess right and you get a flag!
+Enter your number: 123
+Your guess was 123.
+Looking for 1277730927.
+You won. Guess was right! Here's your flag:
+Flag file not found!  Contact an H3 admin for assistance.
+root@c05751c9661d:/home# 
+```
+This confirms the patch worked because the win message appears every time.
+
+## Notes
+also i had to deal with a lot of compatibilty bs because im on a mac and the binary wont run on my machine or on my kali vm either, had to make a docker x86 environment to run and test the binaries
