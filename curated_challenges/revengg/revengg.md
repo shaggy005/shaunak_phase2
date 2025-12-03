@@ -432,3 +432,5 @@ When I ran it, I got:
 DawgCTF{FR33_C4R_W45H!}
 ```
 There was also some process ID check in the code, but it didn’t matter because we were extracting the bytes directly.
+
+## dusty_intermediate
