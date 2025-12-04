@@ -318,6 +318,389 @@ This confirms the patch worked because the win message appears every time.
 ### Notes
 also i had to deal with a lot of compatibilty bs because im on a mac and the binary wont run on my machine or on my kali vm either, had to make a docker x86 environment to run and test the binaries
 
+# 4. VerdisQuo
+here we have an android apk and the flag is hidden somewhere in it
+- my first thought was to disassemble it in ida, but that didnt bring u anything meaningful
+- then i opened it in android studio
+- i emulated the app and opened it but it only said "too slow"
+- that should have been my first clue that the app is erasing something as soon as i open the app
+- then i open the apk in jadx
+- out of everything what looked most interesting was the folder called ``byuctf.downwithefrench``
+- so this must be where the stuff happens
+- i open the main file
+```
+package byuctf.downwiththefrench;
+
+import android.os.Bundle;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+/* loaded from: classes3.dex */
+public class MainActivity extends AppCompatActivity {
+    @Override // androidx.fragment.app.FragmentActivity, androidx.activity.ComponentActivity, androidx.core.app.ComponentActivity, android.app.Activity
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Utilities util = new Utilities(this);
+        util.cleanUp();
+        TextView homeText = (TextView) findViewById(R.id.homeText);
+        homeText.setText("Too slow!!");
+    }
+}
+```
+so the app opens up whatever was inside utilities then cleans it up then prints "too slow"
+i open up utilities to see this
+```
+package byuctf.downwiththefrench;
+
+import android.app.Activity;
+import android.widget.TextView;
+
+/* loaded from: classes3.dex */
+public class Utilities {
+    private Activity activity;
+
+    public Utilities(Activity activity) {
+        this.activity = activity;
+    }
+
+    public void cleanUp() {
+        TextView flag = (TextView) this.activity.findViewById(R.id.flagPart1);
+        flag.setText("");
+        TextView flag2 = (TextView) this.activity.findViewById(R.id.flagPart2);
+        flag2.setText("");
+        TextView flag3 = (TextView) this.activity.findViewById(R.id.flagPart3);
+        flag3.setText("");
+        TextView flag4 = (TextView) this.activity.findViewById(R.id.flagPart4);
+        flag4.setText("");
+        TextView flag5 = (TextView) this.activity.findViewById(R.id.flagPart5);
+        flag5.setText("");
+        TextView flag6 = (TextView) this.activity.findViewById(R.id.flagPart6);
+        flag6.setText("");
+        TextView flag7 = (TextView) this.activity.findViewById(R.id.flagPart7);
+        flag7.setText("");
+        TextView flag8 = (TextView) this.activity.findViewById(R.id.flagPart8);
+        flag8.setText("");
+        TextView flag9 = (TextView) this.activity.findViewById(R.id.flagPart9);
+        flag9.setText("");
+        TextView flag10 = (TextView) this.activity.findViewById(R.id.flagPart10);
+        flag10.setText("");
+        TextView flag11 = (TextView) this.activity.findViewById(R.id.flagPart11);
+        flag11.setText("");
+        TextView flag12 = (TextView) this.activity.findViewById(R.id.flagPart12);
+        flag12.setText("");
+        TextView flag13 = (TextView) this.activity.findViewById(R.id.flagPart13);
+        flag13.setText("");
+        TextView flag14 = (TextView) this.activity.findViewById(R.id.flagPart14);
+        flag14.setText("");
+        TextView flag15 = (TextView) this.activity.findViewById(R.id.flagPart15);
+        flag15.setText("");
+        TextView flag16 = (TextView) this.activity.findViewById(R.id.flagPart16);
+        flag16.setText("");
+        TextView flag17 = (TextView) this.activity.findViewById(R.id.flagPart17);
+        flag17.setText("");
+        TextView flag18 = (TextView) this.activity.findViewById(R.id.flagPart18);
+        flag18.setText("");
+        TextView flag19 = (TextView) this.activity.findViewById(R.id.flagPart19);
+        flag19.setText("");
+        TextView flag20 = (TextView) this.activity.findViewById(R.id.flagPart20);
+        flag20.setText("");
+        TextView flag21 = (TextView) this.activity.findViewById(R.id.flagPart21);
+        flag21.setText("");
+        TextView flag22 = (TextView) this.activity.findViewById(R.id.flagPart22);
+        flag22.setText("");
+        TextView flag23 = (TextView) this.activity.findViewById(R.id.flagPart23);
+        flag23.setText("");
+        TextView flag24 = (TextView) this.activity.findViewById(R.id.flagPart24);
+        flag24.setText("");
+        TextView flag25 = (TextView) this.activity.findViewById(R.id.flagPart25);
+        flag25.setText("");
+        TextView flag26 = (TextView) this.activity.findViewById(R.id.flagPart26);
+        flag26.setText("");
+        TextView flag27 = (TextView) this.activity.findViewById(R.id.flagPart27);
+        flag27.setText("");
+        TextView flag28 = (TextView) this.activity.findViewById(R.id.flagPart28);
+        flag28.setText("");
+    }
+}
+```
+- to view the text we need to see the layout
+- so i navigate to the layout xml
+```
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/homeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="b"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.066"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.022"/>
+    <TextView
+        android:id="@+id/flagPart1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="420dp"
+        android:text="}"
+        android:layout_marginEnd="216dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="616dp"
+        android:text="t"
+        android:layout_marginEnd="340dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="556dp"
+        android:text="a"
+        android:layout_marginEnd="332dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="676dp"
+        android:text="y"
+        android:layout_marginEnd="368dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="500dp"
+        android:text="c"
+        android:layout_marginEnd="252dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="636dp"
+        android:text="c"
+        android:layout_marginEnd="348dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="436dp"
+        android:text="d"
+        android:layout_marginEnd="364dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="496dp"
+        android:text="r"
+        android:layout_marginEnd="348dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="536dp"
+        android:text="n"
+        android:layout_marginEnd="336dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="456dp"
+        android:text="i"
+        android:layout_marginEnd="360dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="536dp"
+        android:text="0"
+        android:layout_marginEnd="276dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="516dp"
+        android:text="d"
+        android:layout_marginEnd="340dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart13"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="460dp"
+        android:text="k"
+        android:layout_marginEnd="232dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="656dp"
+        android:text="u"
+        android:layout_marginEnd="356dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart15"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="452dp"
+        android:text="p"
+        android:layout_marginEnd="320dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="476dp"
+        android:text="o"
+        android:layout_marginEnd="352dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart17"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="500dp"
+        android:text="c"
+        android:layout_marginEnd="300dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart18"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="596dp"
+        android:text="f"
+        android:layout_marginEnd="332dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart19"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="484dp"
+        android:text="e"
+        android:layout_marginEnd="308dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="436dp"
+        android:text="_"
+        android:layout_marginEnd="328dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart21"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="516dp"
+        android:text="e"
+        android:layout_marginEnd="292dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart22"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="536dp"
+        android:text="_"
+        android:layout_marginEnd="284dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart23"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="536dp"
+        android:text="f"
+        android:layout_marginEnd="268dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart24"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="468dp"
+        android:text="i"
+        android:layout_marginEnd="316dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart25"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="516dp"
+        android:text="_"
+        android:layout_marginEnd="260dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart26"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="480dp"
+        android:text="4"
+        android:layout_marginEnd="240dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart27"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="440dp"
+        android:text="e"
+        android:layout_marginEnd="224dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/flagPart28"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="576dp"
+        android:text="{"
+        android:layout_marginEnd="324dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+so these are the texts that the app is clearing, so see it in order we copy paste this xml in a blank app
+<img width="1799" height="1071" alt="Screenshot 2025-12-04 at 7 17 56 AM" src="https://github.com/user-attachments/assets/35e65511-23b3-460c-a312-6236e7214733" />
+### and we get our flag
+``byuctf{android_piece_0f_c4ke}``
+
 # 5. Dusty
 ## dust_noob
 - opened this in ida 
