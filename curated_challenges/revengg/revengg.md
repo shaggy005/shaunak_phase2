@@ -954,3 +954,53 @@ shaunak@Shaunaks-MacBook-Pro dusty %
 ```
 ### Final Flag
 ``DawgCTF{S0000_CL43N!}``
+
+## dust_pro
+similar to the last two but a few caveats here and there
+the program prints some text and asks for an input. it reads a line, tries to parse it as an integer, and then does something with it.
+i saw this loop in the code:
+```
+while ( 1 ) {
+    // ... bounds checks ...
+    v50[v57] ^= *((_BYTE *)&v54 + v22);
+}
+```
+- variable v50 was a big array of numbers (bytes), and v54 was the number i typed in. the ^= meant it was XORing the array with my input number.
+- after the loop, it does a SHA256 hash check.
+- at first, i thought, "can i just patch the jump?" like, find the jz instruction where it checks the hash and change it so it always says i win?
+- but then i realized if i did that, the flag would still be encrypted because the program uses my input to actually decrypt the text. if i put in the wrong number, the XOR math produces garbage.
+- so i had to find the correct input number that decrypts the flag.
+- i copied the bytes from the code (IDA showed them as negative numbers like -49, so I had to convert them to normal bytes).
+- since it's XOR, I knew that: ``Encrypted_Byte XOR Key = Real_Flag_Letter``
+- i wrote a python script to brute force it. I figured the flag probably started with DawgCTF since the last two challenges also had the same format (i cheated a bit but come on, this much should be allowed since if sm1 was in the real ctf this would be a valid solution)
+```
+def solve():
+    # These are the bytes I got from IDA
+    encrypted_bytes = [
+        207, 9, 30, 179, 200, 60, 47, 175, 191, 36, 37, 139, 
+        217, 61, 92, 227, 212, 38, 89, 139, 200, 92, 59, 245, 246
+    ]
+
+    # Trying to find the key by guessing the header is "Dawg"
+    known_header = "Dawg"
+    key = []
+    for i in range(4):
+        key.append(encrypted_bytes[i] ^ ord(known_header[i]))
+
+    print("Key found:", key)
+
+    # Now print the whole thing
+    out = ""
+    for i, byte in enumerate(encrypted_bytes):
+        out += chr(byte ^ key[i % 4])
+    print("Flag:", out)
+
+solve()
+```
+```
+shaunak@Shaunaks-MacBook-Pro dusty % python3 prosolve.py 
+Key found: [139, 104, 105, 212]
+Flag: DawgCTF{4LL_RU57_N0_C4R!}
+shaunak@Shaunaks-MacBook-Pro dusty % 
+```
+### Flag: ``DawgCTF{4LL_RU57_N0_C4R!}``
