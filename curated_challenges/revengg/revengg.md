@@ -260,6 +260,121 @@ The program prints the flag:
 **KCTF{NjkSfTYaIi}**
 
 # 3. time
+when i ran the binary normally it just said it was thinking of a random number and wanted me to guess it. if i guessed right, it would give a flag. obviously i’m not going to brute force a rand() number, so i opened the binary in ida and looked at the pseudocode. it was pretty straightforward: they called time(), seeded the prng, called rand() once, stored the result in a variable, and compared it with my input. if they were equal they read /home/h3/flag.txt.
+
+there was no trick, the solution was just read the return value of rand() using a debugger.
+
+### finding the value in gdb
+first i checked architecture:
+```
+file time:
+ELF 64-bit x86-64
+```
+so i used normal gdb:
+```
+gdb ./time
+```
+then i set a breakpoint on rand:
+```
+break rand
+```
+next i started the program:
+```
+run
+```
+it stopped inside libc at rand(). i didn’t care about stepping inside the library code, so i just finished the current function:
+```
+finish
+```
+this returned execution back to my main function, right after:
+```
+v6 = rand();
+```
+gdb actually printed the return value automatically:
+```
+Value returned is $1 = 494044218
+```
+to be sure, i printed eax explicitly:
+```
+p/d $eax
+494044218
+```
+this is the exact number that rand() produced
+### feeding the number back
+then i just resumed the program:
+```
+continue
+```
+the binary asked for my guess, so i typed: ``494044218``
+### output:
+```
+Your guess was 494044218.
+Looking for 494044218.
+You won. Guess was right! Here's your flag:
+Flag file not found!  Contact an H3 admin for assistance.
+```
+```
+ganesh-pavankumar-marada@ganesh-pavankumar-marada-Latitude-E5470:~/Downloads$ gdb ./time
+GNU gdb (Ubuntu 15.0.50.20240403-0ubuntu1) 15.0.50.20240403-git
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./time...
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.ubuntu.com>
+Enable debuginfod for this session? (y or [n]) y
+Debuginfod has been enabled.
+To make this setting permanent, add 'set debuginfod enabled on' to .gdbinit.
+(No debugging symbols found in ./time)
+(gdb) break rand
+Breakpoint 1 at 0x400790
+(gdb) run
+Starting program: /home/ganesh-pavankumar-marada/Downloads/time
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+Download failed: Invalid argument.  Continuing without source file ./stdlib/./stdlib/rand.c.
+Download failed: Invalid argument.  Continuing without source file ./stdlib/./stdlib/rand.c.
+
+Breakpoint 1, 0x00007ffff7c4a0a8 in rand () at ./stdlib/rand.c:27
+warning: 27 ./stdlib/rand.c: No such file or directory
+(gdb) finish
+Run till exit from #0  0x00007ffff7c4a0a8 in rand () at ./stdlib/rand.c:27
+0x000000000040095f in main ()
+Value returned is $1 = 494044218
+(gdb) p/d $eax
+$2 = 494044218
+(gdb) continue
+Continuing.
+Welcome to the number guessing game!
+I'm thinking of a number. Can you guess it?
+Guess right and you get a flag!
+Enter your number: 494044218
+Your guess was 494044218.
+Looking for 494044218.
+You won. Guess was right! Here's your flag:
+Flag file not found!  Contact an H3 admin for assistance.
+[Inferior 1 (process 24225) exited normally]
+(gdb) Quit
+(gdb) 
+```
+so the logic was correct, the check succeeded. the actual flag file wasn’t included in my copy, so it printed the error message, but if the file existed it would’ve dumped the contents.
+### Notes
+had to use my roomie's laptop here cause my docker and kali vm were both tweaking out
+regular mac user crashout
+
+## Alternate Solve:
 I opened the binary in ida, and read the pseudocode.
 
 inside main(), i saw that the program is a number-guessing game that generates a random number using srand(time(0)) and then rand(), asks for a guess and then prints the secret number afterwards if the guess is wrong, else it prints the flag from flag.txt
