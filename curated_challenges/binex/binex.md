@@ -1,4 +1,52 @@
 # IMMADEV
+this challenge turned out to be one of those problems that looks like it might be complex, but the real trick is understanding what the code is doing and what it definitely isn’t doing.
+## overview
+when the binary starts, it prints a menu:
+```
+Hi I'm sudonymouse!
+I'm learning development, checkout this binary!
+Option 1: Hello <USER>
+Option 2: Flag(maybe?)
+Option 3: Log into my binary!
+```
+then it calls handleOption(), which is where the entire program logic happens.
+##input parsing
+the important detail is that the binary doesn’t ask repeatedly for options. instead, it reads one line of input, splits it into integers, and stores them into an array:
+```
+getline(cin, v12);
+istringstream(v13, v12);
+while (istream >> v9) {
+    if (v9 in [1..3])
+        v14[v10++] = v9;
+}
+```
+so if the user types: ``1 2 3``
+the array becomes: ``v14 = [1, 2, 3]``
+the functions are executed in that order.
+## the joke
+right after parsing, the code checks only one thing:
+```
+if (v14[0] == 2 && geteuid())
+{
+    print "Error: Option 2 requires root privileges HAHA"
+}
+```
+this is funny for two reasons:
+it only checks the first selected option
+it checks if the process uid is not root
+the message doesn’t matter, because it won't stop execution unless option 2 was the only thing supplied
+this means if you send: ``2``
+the program prints: ``Error: Option 2 requires root privileges HAHA``
+and never prints the flag
+but if you send: ``1 2``
+now v14[0] == 1, so the check is skipped. execution goes into the loop:
+```
+1 → sayHello()
+
+2 → printFlag()
+```
+so the flag is printed.
+this is why typing 1 2 solved it.
 ```
 shaunak@Shaunaks-MacBook-Pro ~ % nc localhost 5151
 
@@ -11,6 +59,8 @@ Option 3: Log into my binary!
 Input your name: shaunak
 Hi shaunak
 nite{fake_flag}
+```
+```
 shaunak@Shaunaks-MacBook-Pro ~ % nc immadeveloper.nitephase.live 61234
 
 Hi I'm sudonymouse!
@@ -21,6 +71,10 @@ Option 3: Log into my binary!
 1 2
 Input your name: shaunak
 Hi shaunak
+nite{n0t_4ll_b1n3x_15_st4ck_b4s3d!}
+```
+## final flag
+```
 nite{n0t_4ll_b1n3x_15_st4ck_b4s3d!}
 ```
 # Performative
