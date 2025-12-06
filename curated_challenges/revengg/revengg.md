@@ -371,8 +371,8 @@ Flag file not found!  Contact an H3 admin for assistance.
 ```
 so the logic was correct, the check succeeded. the actual flag file wasn’t included in my copy, so it printed the error message, but if the file existed it would’ve dumped the contents.
 ### Notes
-had to use my roomie's laptop here cause my docker and kali vm were both tweaking out
-regular mac user crashout
+had to use my roomie's laptop here cause my docker and kali vm were both tweaking out.
+nothing, just regular mac user crashout
 
 ## Alternate Solve:
 I opened the binary in ida, and read the pseudocode.
