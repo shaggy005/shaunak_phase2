@@ -3,6 +3,8 @@ basic sqli challenge that i thought was too overcomplicated for a while but late
 ```
 ' OR 1=1 --
 ```
+<img width="1789" height="688" alt="image" src="https://github.com/user-attachments/assets/5f6ffb06-7bb1-485d-bb56-b0cf75fc7d71" />
+
 ```
 %' OR department='Management' OR '%'='
 ```
