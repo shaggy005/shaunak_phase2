@@ -37,7 +37,7 @@ i % 4 == 3 → sinh(x / 10)
 ```
 - this converts a floating point value into an integer, XORs it with a constant, and converts it back. That operation breaks smoothness and makes the network output extremely sensitive to small changes in input.
 - Key Observation
-- - inputs are not validated in any way
+  - inputs are not validated in any way
   - floating-point values are compared directly against a target
   - the network is deterministic
   - the XOR step introduces discontinuities
