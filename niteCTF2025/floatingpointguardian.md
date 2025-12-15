@@ -20,7 +20,7 @@ fabs(probability - TARGET_PROBABILITY) < EPSILON
  → Output layer (1 neuron, sigmoid)
 ```
 - there is no training, randomness or state. if we give the same inputs, the output will always be the same
-# Input transformations
+## Input transformations
 - each input is transformed before entering the first layer, depending on its index:
 ```
 i % 4 == 0 → custom XOR-based activation
