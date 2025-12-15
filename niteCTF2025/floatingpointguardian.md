@@ -1,4 +1,63 @@
+# Floating Point Guardian
+- the challenge provides the C source code for an ai gatekeeper program. the program asks 15 questions and expects 15 floating point answers, processes the answers through a hardcoded neural network, and computes a final value called `MASTER PROBABILITY`
+- if this probability matches a fixed target value within a small tolerance, the program prints the flag
+- so we need to find a set of 15 values that cause the network output to fall inside the allowed range
+- all weights, biases, and activation functions are given
+from the constants:
+```
+#define TARGET_PROBABILITY 0.7331337420
+#define EPSILON 0.00001
+```
+the success condition is:
+```
+fabs(probability - TARGET_PROBABILITY) < EPSILON
+```
+## Network Structure
+- we have 15 inputs
+```
+ → Hidden layer 1 (8 neurons, tanh)
+ → Hidden layer 2 (6 neurons, tanh)
+ → Output layer (1 neuron, sigmoid)
+```
+- there is no training, randomness or state. if we give the same inputs, the output will always be the same
+# Input transformations
+- each input is transformed before entering the first layer, depending on its index:
+```
+i % 4 == 0 → custom XOR-based activation
 
+i % 4 == 1 → tanh(x)
+
+i % 4 == 2 → cos(x)
+
+i % 4 == 3 → sinh(x / 10)
+```
+- the XOR activation is the most interesting part:
+```
+(long)(x * 1000000) ^ key
+```
+- this converts a floating point value into an integer, XORs it with a constant, and converts it back. That operation breaks smoothness and makes the network output extremely sensitive to small changes in input.
+- Key Observation
+- - inputs are not validated in any way
+  - floating-point values are compared directly against a target
+  - the network is deterministic
+  - the XOR step introduces discontinuities
+- because of this, the problem is not about correct answers or realistic values.
+- it is a numerical constraint problem, we need to push the output into a narrow floating-point window by choosing appropriate inputs.
+
+## Strategy
+- since all math is known and deterministic, the cleanest approach is to:
+- reimplement the exact forward pass in Python
+- generate candidate input vectors
+- evaluate how close the output is to the target
+- repeat until the error falls below the allowed epsilon
+- this avoids guessing and keeps the process controlled and measurable.
+## Solver Behavior
+the python solver mirrors the C code exactly:
+- same weights
+- same activations
+- same floating point behavior
+it keeps track of the best error seen so far and prints progress periodically, so convergence is visible instead of opaque.
+over time, the error consistently decreases as better candidates are found.
 ```
 import math
 import random
