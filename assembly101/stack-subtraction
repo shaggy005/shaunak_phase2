@@ -1,0 +1,21 @@
+## schript
+```
+from pwn import *
+
+context.clear(arch='amd64')
+
+code = asm("""
+    pop rax
+    sub rax, rdi
+    push rax
+""")
+
+p = process('/challenge/run')
+p.send(code)
+p.shutdown('send')
+print(p.recvall(timeout=2))
+```
+## flag
+```
+pwn.college{kdw0cT07mDLCyaNtXSmk0DZ0TNU.ddDMywSMwEzNzEzW}
+```
