@@ -10,5 +10,5 @@ nasm -f elf64 16.asm && ld -s -o 16 16.o && /challenge/run 16
 ```
 ## flag
 ```
-pwn.college{43pokbQDl2Th4LsfYWnoNt-NODC.QX0EDOzwSMwEzNzEzW}
+pwn.college{kQvUgProGAjuRR6INnp6Bp1vlU3.dRDMywSMwEzNzEzW}
 ```
