@@ -908,7 +908,7 @@ v3[21] = 30;
 ```
 
 - this was the first 22 bytes of some encoded data
-- then i saw the code accidentally reads one more byte: ``s[i] = v3[i] ^ 0x3F;``
+- then i saw the code also reads one more byte: ``s[i] = v3[i] ^ 0x3F;``
 - but at index 22, v3[22] actually comes from v4[0], which was set to 'B'.
 - so the full array has 23 bytes total.
 - shen there was a loop: ``s[i] = v3[i] ^ 0x3F;``
