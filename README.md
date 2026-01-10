@@ -10,3 +10,4 @@
 - Also solved a grand total of ONE question from NITECTF (floating point guardian)
 - also solved a osint question in nitectf but im told it doesnt count
 - also started with Advent of Pwn
+- fingers crossed
