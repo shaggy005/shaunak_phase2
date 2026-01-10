@@ -151,10 +151,6 @@ so my payload looked like:
 ```
 "A" * 72 + address_of_win
 ```
-later i learned to add a small ret gadget before win because it fixes stack alignment on amd64, so it became:
-```
-"A" * 72 + ret + win
-```
 now comes the first issue i faced. when i tried piping the payload into the program, it didn’t work. i realized that the program asked for two inputs:
 first it says “enter your name”
 then after that it says “enter the amount for customizations”
