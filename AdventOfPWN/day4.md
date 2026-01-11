@@ -1,5 +1,5 @@
-> The program loads a special kernel watcher (eBPF) that listens every time I use ln.
-> It checks the filenames I use and only succeeds if I follow a hidden correct order.
+> The program loads a special kernel watcher (eBPF) that cheks every time I use ln.
+> It checks the filenames I use and only succeeds if I follow the correct order.
 
 - If I give the right sequence, the program prints the flag.
 
