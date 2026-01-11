@@ -1,3 +1,4 @@
+```
 Extracting binary code from provided ELF file...
 Executing your code...
 ---------------- CODE ----------------
@@ -20,3 +21,4 @@ Executing your code...
 0x400032:	sub   	eax, dword ptr [rdi + 0xc]
 --------------------------------------
 pwn.college{Qiy71TIBK5h39R4uHzSJkkNc0HC.dFTMywSMwEzNzEzW}
+```
