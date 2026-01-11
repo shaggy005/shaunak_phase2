@@ -1,3 +1,12 @@
+```
+cmp rdi, 3
+ja some
+jmp [rsi + rdi*8]
+some: 
+    jmp [rsi + 4*8]
+```
+
+```
 Extracting binary code from provided ELF file...
 Executing your code...
 ---------------- CODE ----------------
@@ -17,3 +26,4 @@ Completed test 80
 Completed test 90
 Completed test 100
 pwn.college{4VJ1tSKkk1vFUPzG_FBkhTWzz6_.dJTMywSMwEzNzEzW}
+```
