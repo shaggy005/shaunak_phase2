@@ -1,4 +1,28 @@
 ```
+mov ebx, [rdi+4]
+mov ecx, [rdi+8]
+mov edx, [rdi+12]
+mov eax, [rdi]
+cmp eax, 0x7f454c46
+je lab_if
+cmp eax, 0x00005A4D
+je lab_elif
+imul ebx, ecx
+imul ebx, edx
+jmp done
+lab_if:
+    add ebx, ecx
+    add ebx, edx
+    jmp done
+lab_elif:
+    sub ebx, ecx
+    sub ebx, edx
+    jmp done
+done:
+    mov eax, ebx
+```
+
+```
 Extracting binary code from provided ELF file...
 Executing your code...
 ---------------- CODE ----------------
