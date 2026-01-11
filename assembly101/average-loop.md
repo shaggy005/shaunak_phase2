@@ -1,3 +1,5 @@
+
+```
 Extracting binary code from provided ELF file...
 Executing your code...
 ---------------- CODE ----------------
@@ -13,3 +15,4 @@ Executing your code...
 0x400019:	idiv  	rsi
 --------------------------------------
 pwn.college{QoaSQnGej5ujyuGVC0nW9dcBOP6.dNTMywSMwEzNzEzW}
+```
